@@ -1,0 +1,369 @@
+version: "2"
+
+services:
+  # traefik:
+  #   build:
+  #     context: ./dockerfiles/traefik
+  #     args:
+  #       - REPOSITORY=
+  #       - IMAGE=traefik
+  #       - TAG=latest
+  #       - AUTHOR="David GUENAULT"
+  #   image: dguenault/traefik:latest
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   ports:
+  #     - "8080:8080"
+  #     - "8001:8001"
+  #     - "8002:8002"
+  #     - "80:80"
+
+  base:
+    build:
+      context: ./dockerfiles/base
+      args:
+        - REPOSITORY=
+        - IMAGE=centos
+        - TAG=7
+        - AUTHOR="David GUENAULT"
+    image: dguenault/graphite-base:latest
+  cache1:
+    build:
+      context: ./dockerfiles/carbon
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - TWISTEDVERSION=11.1.0
+        - AUTHOR=David GUENAULT
+        - PREFIX_PATH=/opt/graphite
+    image: dguenault/carbon:1.1.5
+    hostname: cache1
+    environment:
+      - INSTANCESFROM=1
+      - INSTANCESTO=1
+      - INSTANCESRC=i1
+      - CARBONTYPE=cache
+      - CARBON=/opt/graphite/bin/carbon-cache.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    volumes:
+      - cache-data1:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  cache2:
+    build:
+      context: ./dockerfiles/carbon
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - TWISTEDVERSION=11.1.0
+        - AUTHOR=David GUENAULT
+        - PREFIX_PATH=/opt/graphite
+    image: dguenault/carbon:1.1.5
+    hostname: cache2
+    environment:
+      - INSTANCESFROM=2
+      - INSTANCESTO=2
+      - INSTANCESRC=i1
+      - CARBONTYPE=cache
+      - CARBON=/opt/graphite/bin/carbon-cache.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    volumes:
+      - cache-data1:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  cache3:
+    build:
+      context: ./dockerfiles/carbon
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - TWISTEDVERSION=11.1.0
+        - AUTHOR=David GUENAULT
+        - PREFIX_PATH=/opt/graphite
+    image: dguenault/carbon:1.1.5
+    hostname: cache3
+    environment:
+      - INSTANCESFROM=3
+      - INSTANCESTO=3
+      - INSTANCESRC=i1
+      - CARBONTYPE=cache
+      - CARBON=/opt/graphite/bin/carbon-cache.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    volumes:
+      - cache-data1:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  cache4:
+    build:
+      context: ./dockerfiles/carbon
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - TWISTEDVERSION=11.1.0
+        - AUTHOR=David GUENAULT
+        - PREFIX_PATH=/opt/graphite
+    image: dguenault/carbon:1.1.5
+    hostname: cache4
+    environment:
+      - INSTANCESFROM=4
+      - INSTANCESTO=4
+      - INSTANCESRC=i2
+      - CARBONTYPE=cache
+      - CARBON=/opt/graphite/bin/carbon-cache.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    volumes:
+      - cache-data2:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  cache5:
+    build:
+      context: ./dockerfiles/carbon
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - TWISTEDVERSION=11.1.0
+        - AUTHOR=David GUENAULT
+        - PREFIX_PATH=/opt/graphite
+    image: dguenault/carbon:1.1.5
+    hostname: cache5
+    environment:
+      - INSTANCESFROM=5
+      - INSTANCESTO=5
+      - INSTANCESRC=i2
+      - CARBONTYPE=cache
+      - CARBON=/opt/graphite/bin/carbon-cache.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    volumes:
+      - cache-data2:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  cache6:
+    build:
+      context: ./dockerfiles/carbon
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - TWISTEDVERSION=11.1.0
+        - AUTHOR=David GUENAULT
+        - PREFIX_PATH=/opt/graphite
+    image: dguenault/carbon:1.1.5
+    hostname: cache6
+    environment:
+      - INSTANCESFROM=6
+      - INSTANCESTO=6
+      - INSTANCESRC=i2
+      - CARBONTYPE=cache
+      - CARBON=/opt/graphite/bin/carbon-cache.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    volumes:
+      - cache-data2:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  relay1:
+    image: dguenault/carbon:1.1.5
+    hostname: relay1
+    environment:
+      - INSTANCESFROM=1
+      - INSTANCESTO=1
+      - CARBONTYPE=relay
+      - CARBON=/opt/graphite/bin/carbon-relay.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  relay2:
+    image: dguenault/carbon:1.1.5
+    hostname: relay2
+    environment:
+      - INSTANCESFROM=2
+      - INSTANCESTO=2
+      - CARBONTYPE=relay
+      - CARBON=/opt/graphite/bin/carbon-relay.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  relay3:
+    image: dguenault/carbon:1.1.5
+    hostname: relay3
+    environment:
+      - INSTANCESFROM=3
+      - INSTANCESTO=3
+      - CARBONTYPE=relay
+      - CARBON=/opt/graphite/bin/carbon-relay.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    ports:
+      - "2003:2003"
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  graphiteweb1:
+    image: dguenault/graphiteweb:1.1.5
+    hostname: graphiteweb1
+    build:
+      context: ./dockerfiles/graphite-web
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - AUTHOR=David GUENAULT
+    environment:
+      - SECRET_KEY=eozirezopirzopd0sv8dfj4eopizepfizepo
+      - CLUSTER_SERVERS=
+      - CARBOLINK_HOSTS="cache1:7102:1","cache2:7102:2","cache3:7102:3"
+      - REPLICATION_FACTOR=1
+      - GUNICORN_PORT=8001
+      - GUNICORN_WORKERS=2
+    ports:
+      - "8001:8001"
+    volumes:
+      - cache-data1:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+  graphiteweb2:
+    image: dguenault/graphiteweb:1.1.5
+    hostname: graphiteweb2
+    build:
+      context: ./dockerfiles/graphite-web
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - AUTHOR=David GUENAULT
+    environment:
+      - SECRET_KEY=eozirezopirzopd0sv8dfj4eopizepfizepo
+      - CLUSTER_SERVERS=
+      - CARBOLINK_HOSTS="cache4:7102:4","cache5:7102:5","cache6:7102:6"
+      - REPLICATION_FACTOR=1
+      - GUNICORN_PORT=8002
+      - GUNICORN_WORKERS=2
+    ports:
+      - "8002:8002"
+    volumes:
+      - cache-data2:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+
+  graphiteweb3:
+    image: dguenault/graphiteweb:1.1.5
+    hostname: graphiteweb2
+    build:
+      context: ./dockerfiles/graphite-web
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - AUTHOR=David GUENAULT
+    environment:
+      - SECRET_KEY=eozirezopirzopd0sv8dfj4eopizepfizepo
+      - CLUSTER_SERVERS="graphiteweb1:8001", "graphiteweb2:8002"
+      - RENDERING_HOSTS = "graphiteweb1:8001", "graphiteweb2:8002"
+      - CARBOLINK_HOSTS=""
+      - REPLICATION_FACTOR=2
+      - GUNICORN_PORT=8003
+      - GUNICORN_WORKERS=2
+    ports:
+      - "8003:8003"
+    networks:
+      - graphite
+    command: "/run.sh"
+    # depends_on:
+    #   - traefik
+
+  grafana:
+    image: dguenault/grafana:latest
+    hostname: grafana1
+    build:
+      context: ./dockerfiles/grafana
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - AUTHOR=David GUENAULT
+    command: "/usr/sbin/grafana-server --config /etc/grafana/grafana.ini --homepath /usr/share/grafana"
+    networks:
+      - graphite
+    # depends_on:
+    #   - traefik
+  # lb:
+  #   image: haproxy:latest
+  #   hostname: lb
+  #   build:
+  #     context: ./dockerfiles/haproxy
+  #     args:
+  #       - REPOSITORY=
+  #       - IMAGE=haproxy
+  #       - TAG=latest
+  #       - AUTHOR=David GUENAULT
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "3000:3000"
+  #     - "8000:8000"
+  #   volumes:
+  #     - lb-data:/usr/local/etc/haproxy
+
+networks:
+  graphite:
+    driver: bridge
+
+volumes:
+  cache-data1:
+  cache-data2:
+  lb-data:
+  traefik-data:
+  # portainer-data:

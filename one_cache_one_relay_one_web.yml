@@ -1,0 +1,101 @@
+version: "2"
+
+services:
+  base:
+    build:
+      context: ./dockerfiles/base
+      args:
+        - REPOSITORY=
+        - IMAGE=centos
+        - TAG=7
+        - AUTHOR="David GUENAULT"
+    image: dguenault/graphite-base:latest
+  cache1:
+    build:
+      context: ./dockerfiles/carbon
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - TWISTEDVERSION=11.1.0
+        - AUTHOR=David GUENAULT
+        - PREFIX_PATH=/opt/graphite
+        - CONFIG=carbon.conf.crw
+    image: dguenault/carbon:1.1.5
+    hostname: cache1
+    environment:
+      - INSTANCESFROM=1
+      - INSTANCESTO=1
+      - INSTANCESRC=i1
+      - CARBONTYPE=cache
+      - CARBON=/opt/graphite/bin/carbon-cache.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+    volumes:
+      - cache-data1:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+  relay1:
+    image: dguenault/carbon:1.1.5
+    hostname: relay1
+    environment:
+      - INSTANCESFROM=1
+      - INSTANCESTO=1
+      - CARBONTYPE=relay
+      - CARBON=/opt/graphite/bin/carbon-relay.py
+      - CONFIG=/opt/graphite/conf/carbon.conf
+      - LOG_DIR=/var/log/graphite
+      - CONFIG=carbon.conf.crw
+    networks:
+      - graphite
+    command: "/run.sh"
+  graphiteweb1:
+    image: dguenault/graphiteweb:1.1.5
+    hostname: graphiteweb1
+    build:
+      context: ./dockerfiles/graphite-web
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - GRAPHITEVERSION=1.1.5
+        - AUTHOR=David GUENAULT
+    environment:
+      - SECRET_KEY=eozirezopirzopd0sv8dfj4eopizepfizepo
+      - CLUSTER_SERVERS=
+      - CARBOLINK_HOSTS="relay1:7102:1
+      - REPLICATION_FACTOR=1
+      - GUNICORN_PORT=8001
+      - GUNICORN_WORKERS=2
+    ports:
+      - "8001:8001"
+    volumes:
+      - cache-data1:/opt/graphite/storage
+    networks:
+      - graphite
+    command: "/run.sh"
+  grafana:
+    image: dguenault/grafana:latest
+    hostname: grafana1
+    build:
+      context: ./dockerfiles/grafana
+      args:
+        - REPOSITORY=dguenault/
+        - IMAGE=graphite-base
+        - TAG=latest
+        - AUTHOR=David GUENAULT
+    command: "/usr/sbin/grafana-server --config /etc/grafana/grafana.ini --homepath /usr/share/grafana"
+    ports:
+      - "3000:3000"
+    networks:
+      - graphite
+
+networks:
+  graphite:
+    driver: bridge
+
+volumes:
+  cache-data1:
+  grafana-data:
